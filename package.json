@@ -1,0 +1,14 @@
+{
+  "name": "koreanquiz",
+  "version": "0.0.0",
+  "description": "rest server for koreanquiz app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "hyeonseok",
+  "dependencies": {
+    "express": "~4.14.0",
+    "express-stormpath": "~3.1.3"
+  }
+}
