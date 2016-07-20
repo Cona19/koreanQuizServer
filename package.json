@@ -2,12 +2,18 @@
   "name": "koreanquiz",
   "version": "0.0.0",
   "description": "rest server for koreanquiz app",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "author": {
+    "name": "Hyeonseok Oh",
+    "email": "hyeonso5@gmail.com"
   },
-  "author": "hyeonseok",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "main": "app.js",
   "dependencies": {
-    "express": "~4.14.0"
+    "express": "~4.14.0",
+    "body-parser": "~1.15.2",
+    "mongoose": "~4.5.5"
   }
 }

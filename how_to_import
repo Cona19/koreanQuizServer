@@ -1,0 +1,2 @@
+iconv -f cp949 -t utf-8 ../korean_dict.csv > ../korean_dict_utf8.csv
+mongoimport --db koreanquiz --collection koreanwords --type csv --file ./korean_dict_utf8.csv --fields id,word,explanation
