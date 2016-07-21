@@ -14,7 +14,20 @@ module.exports = function(app, KoreanWord)
     KoreanWord.find({id: word_id}, {id: 1, word: 1, explanation: 1},  function(err, koreanWords){
       if(err) return res.status(500).json({error: err});
       if(koreanWords.length === 0) return res.status(404).json({error: 'word not found'});
-      res.json(koreanWords);
+      res.json(koreanWords[0]);
+    });
+  });
+  // GET RANDOM SINGLE WORD 
+  app.get('/api/words/random', function(req, res){
+    KoreanWord.count(function (err, count){
+      if(err) return res.status(500).json({error: err});
+      var word_id = 1 + Math.floor(Math.random() * count);
+
+      KoreanWord.find({id: word_id}, {id: 1, word: 1, explanation: 1},  function(err, koreanWords){
+        if(err) return res.status(500).json({error: err});
+        if(koreanWords.length === 0) return res.status(404).json({error: 'word not found'});
+        res.json(koreanWords[0]);
+      });
     });
   });
 }
