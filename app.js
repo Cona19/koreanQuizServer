@@ -14,7 +14,11 @@ db.once('open', function(){
 mongoose.connect('mongodb://localhost/koreanquiz');
 
 // DEFINE MODEL
-var KoreanWord = require('./models/koreanWord');
+var dbs = {
+  UserWord: require('./models/userWord'),
+  KoreanWord: require('./models/koreanWord'),
+  UserRecord: require('./models/userRecord')
+};
  
 // [CONFIGURE APP TO USE bodyParser]
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -24,7 +28,7 @@ app.use(bodyParser.json());
 var port = process.env.PORT || 8080;
  
 // [CONFIGURE ROUTER]
-var router = require('./routes')(app, KoreanWord)
+var router = require('./routes')(app, dbs)
  
 // [RUN SERVER]
 var server = app.listen(port, function(){
