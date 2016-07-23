@@ -1,5 +1,8 @@
 module.exports = function(app, models)
 {
+  app.get('/', function(req, res){
+    res.send('success');
+  });
   app.post('/api/record', function(req, res){
     console.log('post record message');
     var facebookUserId = req.body.facebookUserId;
