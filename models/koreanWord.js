@@ -13,7 +13,8 @@ var KoreanWord = mongoose.model('koreanWord', koreanWordSchema);
 fs.readFile('./korean_dict_utf8.csv', function(err, data) {
   if (err) throw err;
 
-  var rows = data.toString().split('\r\n');
+  rows = data.toString().split('\r\n');
+
 
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i].split(',');
@@ -23,9 +24,10 @@ fs.readFile('./korean_dict_utf8.csv', function(err, data) {
       continue;
     }
 
-    KoreanWord.update({id: doc.id}, doc, {upsert: true}).exec();
+    KoreanWord.update({id: doc.id}, doc, {upsert: true}, function(err) {
+      if (err) throw err;
+    });
   }
-  
   console.log('Korean dictionary load completed');
 });
  

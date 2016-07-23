@@ -42,8 +42,8 @@ module.exports = function(app, models)
         });
       }
       else{
-        var inc = {cntCorrect : (succeed ? 1 : 0), cntWrong : (succeed ? 0 : 1)};
-        userRecords[0].update({$inc: inc}, {safe : true}, function(err){
+        var doc = {cntCorrect : userRecords[0].cntCorrect + (succeed ? 1 : 0), cntWrong : userRecords[0].cntWrong + (succeed ? 0 : 1)};
+        userRecords[0].update(doc, {safe : true}, function(err){
           if (err) console.log(err);
         });
       }
@@ -52,25 +52,35 @@ module.exports = function(app, models)
     res.status(200).send();
   });
 
-  // GET ALL WORDS 
+  // GET statistics
   app.get('/api/record/:facebookUserId([0-9]+)', function(req,res){
     console.log('get records');
     var facebookUserId = Number(req.params.facebookUserId);
     var statistics = {};
     models.UserRecord.find({facebookUserId: facebookUserId}, {cntCorrect: 1, cntWrong: 1}, function(err, userRecords){
       if(err) return res.status(500).send({error: 'database failure'});
-      statistics.cntCorrectTry = userRecords[0].cntCorrect;
-      statistics.cntWrongTry = userRecords[0].cntWrong;
-      models.UserWord.find({facebookUserId: facebookUserId, succeed: true}, {}, function(err, userWords){
-        if(err) return res.status(500).send({error: 'database failure'});
-        statistics.cntCorrectProblem = userWords.length;
-        models.UserWord.find({facebookUserId: facebookUserId, succeed: false}, {}, function(err, userWords){
-          if(err) return res.status(500).send({error: 'database failure'});
-          statistics.cntWrongProblem = userWords.length;
-          console.log(statistics);
-          res.json(statistics);
+      if (userRecords.length == 0){
+        res.json({
+          cntCorrectTry: 0,
+          cntWrongTry: 0,
+          cntCorrectProblem: 0,
+          cntWrongProblem: 0
         });
-      });
+      }
+      else{
+        statistics.cntCorrectTry = userRecords[0].cntCorrect;
+        statistics.cntWrongTry = userRecords[0].cntWrong;
+        models.UserWord.find({facebookUserId: facebookUserId, succeed: true}, {}, function(err, userWords){
+          if(err) return res.status(500).send({error: 'database failure'});
+          statistics.cntCorrectProblem = userWords.length;
+          models.UserWord.find({facebookUserId: facebookUserId, succeed: false}, {}, function(err, userWords){
+            if(err) return res.status(500).send({error: 'database failure'});
+            statistics.cntWrongProblem = userWords.length;
+            console.log(statistics);
+            res.json(statistics);
+          });
+        });
+      }
     });
   });
 
