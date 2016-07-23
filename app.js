@@ -10,11 +10,17 @@ db.once('open', function(){
     // CONNECTED TO MONGODB SERVER
     console.log("Connected to mongod server");
 });
- 
-mongoose.connect('mongodb://localhost/koreanquiz');
+
+var mongodbUrl = (
+process.env.OPENSHIFT_MONGODB_DB_HOST ?
+'mongodb://admin:P8wRWVllGnxU@' + process.env.OPENSHIFT_MONGODB_DB_HOST + ':'+ process.env.OPENSHIFT_MONGODB_DB_PORT + '/koreanquiz' :
+'mongodb://localhost/koreanquiz'
+);
+
+mongoose.connect(mongodbUrl); 
 
 // DEFINE MODEL
-var dbs = {
+var models = {
   UserWord: require('./models/userWord'),
   KoreanWord: require('./models/koreanWord'),
   UserRecord: require('./models/userRecord')
@@ -28,7 +34,7 @@ app.use(bodyParser.json());
 var port = process.env.PORT || 8080;
  
 // [CONFIGURE ROUTER]
-var router = require('./routes')(app, dbs)
+var router = require('./routes')(app, models)
  
 // [RUN SERVER]
 var server = app.listen(port, function(){

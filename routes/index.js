@@ -1,4 +1,4 @@
-module.exports = function(app, dbs)
+module.exports = function(app, models)
 {
   app.post('/api/record', function(req, res){
     console.log('post record message');
@@ -7,10 +7,10 @@ module.exports = function(app, dbs)
     var wordId = req.body.wordId;
     console.log(facebookUserId);
 
-    dbs.UserWord.find({facebookUserId: facebookUserId, wordId: wordId}, {succeed: 1}, function(err, userwords){
+    models.UserWord.find({facebookUserId: facebookUserId, wordId: wordId}, {succeed: 1}, function(err, userwords){
       if (err) console.log(err);
       if (userwords.length == 0){
-        var userWord = new dbs.UserWord();
+        var userWord = new models.UserWord();
         userWord.facebookUserId = facebookUserId;
         userWord.wordId = wordId;
         userWord.succeed = succeed;
@@ -27,10 +27,10 @@ module.exports = function(app, dbs)
       }
     });
 
-    dbs.UserRecord.find({facebookUserId: facebookUserId}, {cntCorrect: 1, cntWrong: 1}, function(err, userRecords){
+    models.UserRecord.find({facebookUserId: facebookUserId}, {cntCorrect: 1, cntWrong: 1}, function(err, userRecords){
       if (err) console.log(err);
       if (userRecords.length == 0){
-        var userRecord = new dbs.UserRecord();
+        var userRecord = new models.UserRecord();
         userRecord.facebookUserId = facebookUserId;
         userRecord.cntCorrect = (succeed ? 1 : 0);
         userRecord.cntWrong = (succeed ? 0 : 1);
@@ -54,14 +54,14 @@ module.exports = function(app, dbs)
     console.log('get records');
     var facebookUserId = Number(req.params.facebookUserId);
     var statistics = {};
-    dbs.UserRecord.find({facebookUserId: facebookUserId}, {cntCorrect: 1, cntWrong: 1}, function(err, userRecords){
+    models.UserRecord.find({facebookUserId: facebookUserId}, {cntCorrect: 1, cntWrong: 1}, function(err, userRecords){
       if(err) return res.status(500).send({error: 'database failure'});
       statistics.cntCorrectTry = userRecords[0].cntCorrect;
       statistics.cntWrongTry = userRecords[0].cntWrong;
-      dbs.UserWord.find({facebookUserId: facebookUserId, succeed: true}, {}, function(err, userWords){
+      models.UserWord.find({facebookUserId: facebookUserId, succeed: true}, {}, function(err, userWords){
         if(err) return res.status(500).send({error: 'database failure'});
         statistics.cntCorrectProblem = userWords.length;
-        dbs.UserWord.find({facebookUserId: facebookUserId, succeed: false}, {}, function(err, userWords){
+        models.UserWord.find({facebookUserId: facebookUserId, succeed: false}, {}, function(err, userWords){
           if(err) return res.status(500).send({error: 'database failure'});
           statistics.cntWrongProblem = userWords.length;
           console.log(statistics);
@@ -74,7 +74,7 @@ module.exports = function(app, dbs)
   // GET ALL WORDS 
   app.get('/api/words', function(req,res){
     console.log('get all words');
-    dbs.KoreanWord.find(function(err, koreanWords){
+    models.KoreanWord.find(function(err, koreanWords){
       if(err) return res.status(500).send({error: 'database failure'});
       res.json(koreanWords);
     });
@@ -84,7 +84,7 @@ module.exports = function(app, dbs)
   app.get('/api/words/:wordId([0-9]+)', function(req, res){
     console.log('get single word');
     var wordId = Number(req.params.wordId);
-    dbs.KoreanWord.find({id: wordId}, {id: 1, word: 1, explanation: 1},  function(err, koreanWords){
+    models.KoreanWord.find({id: wordId}, {id: 1, word: 1, explanation: 1},  function(err, koreanWords){
       if(err) return res.status(500).json({error: err});
       if(koreanWords.length === 0) return res.status(404).json({error: 'word not found'});
       res.json(koreanWords[0]);
@@ -93,11 +93,11 @@ module.exports = function(app, dbs)
   // GET RANDOM SINGLE WORD 
   app.get('/api/words/random', function(req, res){
     console.log('get random one word');
-    dbs.KoreanWord.count(function (err, count){
+    models.KoreanWord.count(function (err, count){
       if(err) return res.status(500).json({error: err});
       var word_id = 1 + Math.floor(Math.random() * count);
 
-      dbs.KoreanWord.find({id: word_id}, {id: 1, word: 1, explanation: 1},  function(err, koreanWords){
+      models.KoreanWord.find({id: word_id}, {id: 1, word: 1, explanation: 1},  function(err, koreanWords){
         if(err) return res.status(500).json({error: err});
         if(koreanWords.length === 0) return res.status(404).json({error: 'word not found'});
         res.json(koreanWords[0]);
