@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var fs = require('fs');
 var Schema = mongoose.Schema;
  
+/* Define a schema of KoreanWord */
 var koreanWordSchema = new Schema({
     id: Number,
     word: String,
@@ -10,6 +11,9 @@ var koreanWordSchema = new Schema({
 
 var KoreanWord = mongoose.model('koreanWord', koreanWordSchema);
 
+/*
+If server doesn't response to the request, please remove this initialize part and rerun
+*/
 fs.readFile('./korean_dict_utf8.csv', function(err, data) {
   if (err) throw err;
 

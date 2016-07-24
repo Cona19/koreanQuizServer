@@ -1,8 +1,10 @@
 module.exports = function(app, models)
 {
+  /* Test route */
   app.get('/', function(req, res){
     res.send('success');
   });
+  /* post record to db */
   app.post('/api/record', function(req, res){
     console.log('post record message');
     var facebookUserId = req.body.facebookUserId;
@@ -10,8 +12,10 @@ module.exports = function(app, models)
     var wordId = req.body.wordId;
     console.log(facebookUserId);
 
+    /* If the corresponding document has been found, just update that, and if not, insert a new element. */
     models.UserWord.find({facebookUserId: facebookUserId, wordId: wordId}, {succeed: 1}, function(err, userwords){
       if (err) console.log(err);
+      /* If the corresponding document has been found, just update that. */
       if (userwords.length == 0){
         var userWord = new models.UserWord();
         userWord.facebookUserId = facebookUserId;
@@ -21,6 +25,7 @@ module.exports = function(app, models)
           if(err) console.log(err);
         });
       }
+      /* If not, insert a new element. */
       else{
         if (!userwords[0].succeed){
           userwords[0].update({succeed:succeed}, { safe: true}, function(err){
@@ -32,6 +37,7 @@ module.exports = function(app, models)
 
     models.UserRecord.find({facebookUserId: facebookUserId}, {cntCorrect: 1, cntWrong: 1}, function(err, userRecords){
       if (err) console.log(err);
+      /* If the corresponding document has not been found, insert a new element. */
       if (userRecords.length == 0){
         var userRecord = new models.UserRecord();
         userRecord.facebookUserId = facebookUserId;
@@ -41,6 +47,7 @@ module.exports = function(app, models)
           if (err) console.log(err);
         });
       }
+      /* If there is the corresponding document, update the document.*/
       else{
         var doc = {cntCorrect : userRecords[0].cntCorrect + (succeed ? 1 : 0), cntWrong : userRecords[0].cntWrong + (succeed ? 0 : 1)};
         userRecords[0].update(doc, {safe : true}, function(err){
@@ -52,13 +59,14 @@ module.exports = function(app, models)
     res.status(200).send();
   });
 
-  // GET statistics
+  /* Get user's statistics */
   app.get('/api/record/:facebookUserId([0-9]+)', function(req,res){
     console.log('get records');
     var facebookUserId = Number(req.params.facebookUserId);
     var statistics = {};
     models.UserRecord.find({facebookUserId: facebookUserId}, {cntCorrect: 1, cntWrong: 1}, function(err, userRecords){
       if(err) return res.status(500).send({error: 'database failure'});
+      /* If there is no record about the user, return default json */
       if (userRecords.length == 0){
         res.json({
           cntCorrectTry: 0,
@@ -67,6 +75,7 @@ module.exports = function(app, models)
           cntWrongProblem: 0
         });
       }
+      /* If there is a record, get each value from db and send to client */
       else{
         statistics.cntCorrectTry = userRecords[0].cntCorrect;
         statistics.cntWrongTry = userRecords[0].cntWrong;
@@ -84,7 +93,7 @@ module.exports = function(app, models)
     });
   });
 
-  // GET ALL WORDS 
+  /* Get all words of db */ 
   app.get('/api/words', function(req,res){
     console.log('get all words');
     models.KoreanWord.find(function(err, koreanWords){
@@ -93,7 +102,7 @@ module.exports = function(app, models)
     });
   });
 
-  // GET SINGLE WORD 
+  /* Get a specific word */
   app.get('/api/words/:wordId([0-9]+)', function(req, res){
     console.log('get single word');
     var wordId = Number(req.params.wordId);
@@ -103,7 +112,7 @@ module.exports = function(app, models)
       res.json(koreanWords[0]);
     });
   });
-  // GET RANDOM SINGLE WORD 
+  /* Get a random word */
   app.get('/api/words/random', function(req, res){
     console.log('get random one word');
     models.KoreanWord.count(function (err, count){

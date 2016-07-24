@@ -1,6 +1,6 @@
 {
   "name": "koreanquiz",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "rest server for koreanquiz app",
   "author": {
     "name": "Hyeonseok Oh",

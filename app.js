@@ -4,15 +4,16 @@ var bodyParser  = require('body-parser');
 var mongoose    = require('mongoose');
 var http        = require('http');
 
-// [CONFIGURE mongoose]
+/* Configure mongoose */
 var db = mongoose.connection;
 db.on('error', console.error);
 db.once('open', function(){
-    // CONNECTED TO MONGODB SERVER
+    /* Connected to mongodb server */
     console.log(mongodbUrl);
     console.log("Connected to mongod server");
 });
 
+/* Set url to connect to mongodb server */
 var mongodbUrl = (
 process.env.OPENSHIFT_MONGODB_DB_HOST ?
 ('mongodb://admin:P8wRWVllGnxU@' + process.env.OPENSHIFT_MONGODB_DB_HOST + ':'+ process.env.OPENSHIFT_MONGODB_DB_PORT + '/koreanquiz') :
@@ -21,25 +22,25 @@ process.env.OPENSHIFT_MONGODB_DB_HOST ?
 
 mongoose.connect(mongodbUrl); 
 
-// DEFINE MODEL
+/* Define models */
 var models = {
   UserWord: require('./models/userWord'),
   KoreanWord: require('./models/koreanWord'),
   UserRecord: require('./models/userRecord')
 };
  
-// [CONFIGURE APP TO USE bodyParser]
+/* Configure app to use bodyParser */
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
  
-// [CONFIGURE SERVER IP and PORT]
+/* Configure Server ip and port */
 var ip = process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0';
 var port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
  
-// [CONFIGURE ROUTER]
+/* Configure router */
 var router = require('./routes')(app, models)
  
-// [RUN SERVER]
+/* Run server */
 var server = http.createServer(app);
 server.listen(port, ip);
 server.on('error', function(error){
