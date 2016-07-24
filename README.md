@@ -38,3 +38,5 @@ $ npm start
 - models/ : 사용하는 collection을 정의하여 node.js에서 사용할 수 있도록 함.
 - routes/ : express에 의해 RESTful web service를 제공하기 위해 각 요청별로 분류하여 처리함.
 
+## [DEMO](http://koreanquiz-hs5.rhcloud.com/api/words/random)
+
